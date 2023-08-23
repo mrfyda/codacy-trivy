@@ -20,7 +20,7 @@ workflows:
             - codacy/checkout_and_version
       - codacy_plugins_test/run:
           name: plugins_test
-          run_multiple_tests: true
+          run_multiple_tests: false # TODO: Check if multiple tests are needed
           requires:
             - build_docker_and_test
       - codacy/publish_docker:
