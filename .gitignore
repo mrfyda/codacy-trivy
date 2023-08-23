@@ -1,0 +1,11 @@
+.ammonite
+.mypy_cache
+*~
+.*.swp
+.idea
+.scala-build
+.bsp
+.metals
+.vscode
+project
+target
