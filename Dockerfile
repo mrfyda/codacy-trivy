@@ -14,7 +14,7 @@ COPY docs/ /docs/
 RUN adduser -u 2004 -D docker
 RUN chown -R docker:docker /docs
 
-FROM scratch
+FROM busybox
 
 COPY --from=builder /src/bin /dist/bin
 
