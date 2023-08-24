@@ -9,10 +9,10 @@ workflows:
   compile_test_deploy:
     jobs:
       - codacy/checkout_and_version
-      - codacy/sbt:
-          name: build_docker_and_test
+      - codacy/shell:
+          name: publish_docker_local
           cmd: |
-            # TODO: Ensure doc generation is done
+            go run ./doc-generator.go
             docker build -t $CIRCLE_PROJECT_REPONAME:latest .
             docker save --output docker-image.tar $CIRCLE_PROJECT_REPONAME:latest
           persist_to_workspace: true
@@ -22,7 +22,7 @@ workflows:
           name: plugins_test
           run_multiple_tests: false # TODO: Check if multiple tests are needed
           requires:
-            - build_docker_and_test
+            - publish_docker_local
       - codacy/publish_docker:
           context: CodacyDocker
           requires:

@@ -3,11 +3,12 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"path"
 
 	"github.com/aquasecurity/trivy/pkg/fanal/secret"
-	codacy "github.com/codacy/codacy-engine-golang-seed"
+	codacy "github.com/codacy/codacy-engine-golang-seed/v5"
 	"github.com/samber/lo"
 )
 
@@ -55,13 +56,10 @@ func runTrivy(patterns []codacy.Pattern, files []string, sourceDir string) ([]co
 			Content:  content,
 		})
 		for _, result := range secrets.Findings {
-			// TODO: Generate 'Suggested fix'
-			// TODO: Generate a better Message
-			// TODO: Review if PatternIDs should be abstracted to "Secret Scanning"
 			results = append(results, codacy.Issue{
 				File:      f,
-				Message:   result.Title,
-				PatternID: result.RuleID,
+				Message:   fmt.Sprintf("Found secret for %s: %s", result.Category, result.Title),
+				PatternID: "secret",
 				Line:      result.StartLine,
 			})
 		}
