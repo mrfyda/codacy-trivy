@@ -14,6 +14,7 @@ import (
 
 const (
 	sourceConfigFileName = "trivy.yaml"
+	secretRuleID         = "secret"
 )
 
 func readConfiguration(tool codacy.Tool, sourceFolder string) ([]codacy.Pattern, error) {
@@ -37,13 +38,16 @@ func configurationFromSourceCode(sourceFolder string) ([]codacy.Pattern, error) 
 }
 
 func runTrivy(patterns []codacy.Pattern, files []string, sourceDir string) ([]codacy.Issue, error) {
-	var results []codacy.Issue
-
-	scanner := secret.NewScanner(&secret.Config{
-		EnableBuiltinRuleIDs: lo.Map(patterns, func(p codacy.Pattern, index int) string {
-			return p.PatternID
-		}),
+	var secretDetectionEnabled = lo.SomeBy(patterns, func(p codacy.Pattern) bool {
+		return p.PatternID == secretRuleID
 	})
+	if !secretDetectionEnabled {
+		return []codacy.Issue{}, nil
+	}
+
+	scanner := secret.NewScanner(&secret.Config{})
+
+	var results []codacy.Issue
 
 	for _, f := range files {
 		content, err := os.ReadFile(path.Join(sourceDir, f))
@@ -59,7 +63,7 @@ func runTrivy(patterns []codacy.Pattern, files []string, sourceDir string) ([]co
 			results = append(results, codacy.Issue{
 				File:      f,
 				Message:   fmt.Sprintf("Found secret for %s: %s", result.Category, result.Title),
-				PatternID: "secret",
+				PatternID: secretRuleID,
 				Line:      result.StartLine,
 			})
 		}

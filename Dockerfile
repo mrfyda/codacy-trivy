@@ -6,8 +6,12 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-ADD . .
+COPY main.go .
 RUN go build -o bin/codacy-trivy -ldflags="-s -w" main.go
+
+COPY docs/ docs/
+COPY doc-generator.go .
+RUN go run ./doc-generator.go
 
 COPY docs/ /docs/
 
