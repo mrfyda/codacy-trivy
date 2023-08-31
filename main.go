@@ -62,7 +62,7 @@ func runTrivy(patterns []codacy.Pattern, files []string, sourceDir string) ([]co
 		for _, result := range secrets.Findings {
 			results = append(results, codacy.Issue{
 				File:      f,
-				Message:   fmt.Sprintf("Found secret for %s: %s", result.Category, result.Title),
+				Message:   fmt.Sprintf("Possible hardcoded secret: %s", result.Title),
 				PatternID: secretRuleID,
 				Line:      result.StartLine,
 			})
