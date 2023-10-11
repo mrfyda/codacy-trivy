@@ -9,15 +9,12 @@ RUN go mod verify
 RUN go build -o bin/codacy-trivy -ldflags="-s -w" ./cmd/tool
 RUN go run ./cmd/docgen
 
-COPY docs/ /docs/
-
-RUN adduser -u 2004 -D docker
-RUN chown -R docker:docker /docs
-
 FROM busybox
 
-COPY --from=builder /src/bin /dist/bin
-COPY --from=builder /docs /docs
-COPY --from=builder /etc/passwd /etc/passwd
+RUN adduser -u 2004 -D docker
+
+COPY --from=builder --chown=docker:docker /src/bin /dist/bin
+COPY --from=builder --chown=docker:docker /src/docs /docs 
+COPY --from=builder --chown=docker:docker /src/cache/ /dist/cache/codacy-trivy
 
 CMD [ "/dist/bin/codacy-trivy" ]
